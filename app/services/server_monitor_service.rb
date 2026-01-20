@@ -135,6 +135,20 @@ class ServerMonitorService
   # Execute command with LC_ALL=C to avoid locale warnings
   # and ensure consistent output format
   def exec_command(ssh, command)
-    ssh.exec!("LC_ALL=C #{command}")
+    result = ssh.exec!("LC_ALL=C #{command}")
+    filter_shell_warnings(result)
+  end
+
+  # Filter out shell initialization warnings (e.g., locale warnings)
+  # that appear before command output
+  def filter_shell_warnings(output)
+    return "" if output.blank?
+
+    output.lines.reject do |line|
+      line.include?("warning:") ||
+      line.include?("/etc/profile") ||
+      line.include?("setlocale") ||
+      line.include?("cannot change locale")
+    end.join
   end
 end
