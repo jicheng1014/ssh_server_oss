@@ -3,6 +3,9 @@ class Server < ApplicationRecord
 
   has_many :server_metrics, dependent: :destroy
 
+  # 使用 Active Record Encryption 加密敏感字段
+  encrypts :password, :private_key
+
   validates :name, presence: true
   validates :host, presence: true, uniqueness: true
   validates :username, presence: true
@@ -37,6 +40,26 @@ class Server < ApplicationRecord
       masked_first = first_part.length > 2 ? "#{first_part[0]}***#{first_part[-1]}" : first_part
       "#{masked_first}.#{parts[1..-1].join('.')}"
     end
+  end
+
+  # 获取认证信息，优先级：服务器私钥 > 服务器密码 > 全局私钥
+  def authentication_options
+    if private_key.present?
+      { key_data: [private_key] }
+    elsif password.present?
+      { password: password }
+    else
+      global_key = SshKeyService.private_key
+      if global_key.present?
+        { key_data: [global_key] }
+      else
+        {}
+      end
+    end
+  end
+
+  def has_authentication?
+    private_key.present? || password.present? || SshKeyService.configured?
   end
 
   private

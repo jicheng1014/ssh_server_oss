@@ -66,6 +66,55 @@
   </div>
 <% end %>
 
+<!-- Top Command -->
+<div class="bg-white rounded-lg shadow p-6 mb-6" data-controller="top" data-top-server-id-value="<%= @server.id %>" data-top-interval-value="2000">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800">系统进程监控 (Top)</h2>
+    <div class="flex items-center space-x-4">
+      <span class="text-sm text-gray-500" data-top-target="status">就绪</span>
+      <button 
+        type="button"
+        data-top-target="button"
+        data-action="click->top#toggle"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        查看 Top
+      </button>
+    </div>
+  </div>
+  <div class="bg-black text-green-400 font-mono text-xs p-4 rounded overflow-auto max-h-96" data-top-target="output" style="min-height: 200px; white-space: pre-wrap;">
+    点击"查看 Top"按钮开始实时监控...
+  </div>
+</div>
+
+<!-- Ps Command -->
+<div class="bg-white rounded-lg shadow p-6 mb-6" data-controller="ps" data-ps-server-id-value="<%= @server.id %>">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800">进程列表 (PS)</h2>
+    <div class="flex items-center space-x-4">
+      <select 
+        data-ps-target="formatSelect"
+        class="border border-gray-300 rounded px-3 py-1 text-sm"
+      >
+        <option value="aux">ps aux</option>
+        <option value="ef">ps -ef</option>
+      </select>
+      <span class="text-sm text-gray-500" data-ps-target="status">就绪</span>
+      <button 
+        type="button"
+        data-ps-target="button"
+        data-action="click->ps#fetch"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        查看进程
+      </button>
+    </div>
+  </div>
+  <div class="bg-black text-green-400 font-mono text-xs p-4 rounded overflow-auto max-h-96" data-ps-target="output" style="min-height: 200px; white-space: pre-wrap;">
+    点击"查看进程"按钮获取当前进程列表...
+  </div>
+</div>
+
 <div class="bg-white rounded-lg shadow">
   <div class="p-4 border-b">
     <h2 class="text-lg font-semibold text-gray-800">历史记录</h2>

@@ -13,17 +13,18 @@ class ServerMonitorService
   private
 
   def fetch_metrics
-    private_key = SshKeyService.private_key
-    raise "SSH 私钥未配置" if private_key.blank?
+    raise "SSH 认证信息未配置" unless @server.has_authentication?
+
+    auth_options = @server.authentication_options
 
     Net::SSH.start(
       @server.host,
       @server.username,
       port: @server.port,
-      key_data: [ private_key ],
       non_interactive: true,
       timeout: 10,
-      verify_host_key: :never
+      verify_host_key: :never,
+      **auth_options
     ) do |ssh|
       # Fetch OS info if not already set
       fetch_os_info(ssh) if @server.os_name.blank?

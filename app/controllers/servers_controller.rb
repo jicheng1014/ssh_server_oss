@@ -1,5 +1,5 @@
 class ServersController < ApplicationController
-  before_action :set_server, only: %i[show edit update destroy refresh]
+  before_action :set_server, only: %i[show edit update destroy refresh top ps]
 
   def index
     @servers = Server.includes(:server_metrics).ordered
@@ -57,6 +57,17 @@ class ServersController < ApplicationController
     redirect_to @server, notice: "刷新成功"
   end
 
+  def top
+    result = TopCommandService.new(@server).call
+    render json: result
+  end
+
+  def ps
+    format = params[:format] || "aux"
+    result = PsCommandService.new(@server, format: format).call
+    render json: result
+  end
+
   def refresh_all
     Server.active.find_each do |server|
       RefreshServerJob.perform_later(server)
@@ -82,6 +93,6 @@ class ServersController < ApplicationController
   end
 
   def server_params
-    params.require(:server).permit(:name, :host, :port, :username, :active, :provider)
+    params.require(:server).permit(:name, :host, :port, :username, :active, :provider, :password, :private_key)
   end
 end

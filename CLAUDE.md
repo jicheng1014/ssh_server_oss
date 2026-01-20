@@ -97,6 +97,33 @@ bin/rails ssh:test
 bin/rails ssh:test[server_id]
 ```
 
+### Active Record Encryption
+
+服务器密码和私钥使用 Active Record Encryption 加密存储。首次使用需要配置加密密钥：
+
+**1. 生成加密密钥**
+```bash
+bin/rails db:encryption:init
+```
+
+**2. 将密钥添加到 credentials**
+```bash
+EDITOR=vim bin/rails credentials:edit
+```
+
+添加以下内容（使用 `db:encryption:init` 生成的密钥）：
+```yaml
+active_record_encryption:
+  primary_key: <生成的 primary_key>
+  deterministic_key: <生成的 deterministic_key>
+  key_derivation_salt: <生成的 key_derivation_salt>
+```
+
+**注意：**
+- 加密密钥存储在 Rails credentials 中，请妥善保管
+- 如果丢失加密密钥，已加密的数据将无法解密
+- 私钥和密码字段会自动加密/解密，无需手动处理
+
 ## Key Files
 
 - `app/services/server_monitor_service.rb` - SSH connection and metrics collection logic

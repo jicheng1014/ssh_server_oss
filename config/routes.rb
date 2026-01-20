@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   resources :servers do
     member do
       post :refresh
+      get :top
+      get :ps
     end
     collection do
       post :refresh_all
