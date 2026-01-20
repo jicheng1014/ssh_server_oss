@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_20_174029) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_20_180405) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -81,6 +81,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_20_174029) do
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.index ["host"], name: "index_servers_on_host", unique: true
+  end
+
+  create_table "system_private_keys", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "private_key"
+    t.datetime "updated_at", null: false
   end
 
   create_table "system_settings", force: :cascade do |t|

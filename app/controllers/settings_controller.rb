@@ -4,6 +4,11 @@ class SettingsController < ApplicationController
     @metrics_retention_days = SystemSetting.metrics_retention_days
     @ssh_key_source = SshKeyService.source
     @ssh_key_configured = SshKeyService.configured?
+    @system_private_key_configured = SystemSetting.system_private_key_configured?
+    # 获取私钥用于显示（如果已配置）
+    if @system_private_key_configured
+      @system_private_key = SystemSetting.system_private_key
+    end
   end
 
   def update_monitor_interval
@@ -154,6 +159,42 @@ class SettingsController < ApplicationController
       redirect_to import_servers_settings_path, alert: "YAML 文件格式错误：#{e.message}"
     rescue => e
       redirect_to import_servers_settings_path, alert: "导入失败：#{e.message}"
+    end
+  end
+
+  # 获取系统私钥（用于编辑时显示全文）
+  def system_private_key
+    if SystemSetting.system_private_key_configured?
+      render json: { private_key: SystemSetting.system_private_key }
+    else
+      render json: { private_key: nil }
+    end
+  end
+
+  # 更新系统私钥
+  def update_system_private_key
+    private_key = params[:system_private_key]&.strip
+
+    if private_key.blank?
+      redirect_to settings_path, alert: "私钥不能为空"
+      return
+    end
+
+    begin
+      SystemSetting.system_private_key = private_key
+      redirect_to settings_path, notice: "系统私钥已更新"
+    rescue => e
+      redirect_to settings_path, alert: "更新失败：#{e.message}"
+    end
+  end
+
+  # 删除系统私钥
+  def delete_system_private_key
+    begin
+      SystemSetting.system_private_key = nil
+      redirect_to settings_path, notice: "系统私钥已删除"
+    rescue => e
+      redirect_to settings_path, alert: "删除失败：#{e.message}"
     end
   end
 end

@@ -11,6 +11,11 @@ class ServersController < ApplicationController
     @countries = Server.where.not(country_code: nil).distinct.pluck(:country_code).sort
     @providers = Server.where.not(provider: [ nil, "" ]).distinct.pluck(:provider).sort
     @os_names = Server.where.not(os_name: [ nil, "" ]).distinct.pluck(:os_name).sort
+
+    # 检查是否有全局认证信息配置（如果没有，提示用户去系统设置配置）
+    @has_global_auth = SshKeyService.configured?
+    # 如果没有全局认证信息，并且有服务器，提示用户配置
+    @show_auth_warning = !@has_global_auth && @servers.any?
   end
 
   def show
@@ -57,8 +62,21 @@ class ServersController < ApplicationController
   end
 
   def refresh
-    ServerMonitorService.new(@server).call
-    redirect_to @server, notice: "刷新成功"
+    unless @server.has_authentication?
+      redirect_to settings_path, alert: "SSH 认证信息未配置。请先在系统设置中配置 SSH 私钥。"
+      return
+    end
+
+    begin
+      ServerMonitorService.new(@server).call
+      redirect_to @server, notice: "刷新成功"
+    rescue => e
+      if e.message.include?("SSH 认证信息未配置")
+        redirect_to settings_path, alert: "SSH 认证信息未配置。请先在系统设置中配置 SSH 私钥。"
+      else
+        redirect_to @server, alert: "刷新失败: #{e.message}"
+      end
+    end
   end
 
   def top
@@ -73,6 +91,11 @@ class ServersController < ApplicationController
   end
 
   def refresh_all
+    unless SshKeyService.configured?
+      redirect_to settings_path, alert: "SSH 认证信息未配置。请先在系统设置中配置 SSH 私钥。"
+      return
+    end
+
     Server.active.find_each do |server|
       RefreshServerJob.perform_later(server)
     end

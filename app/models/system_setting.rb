@@ -54,4 +54,24 @@ class SystemSetting < ApplicationRecord
     days = [[days, 1].max, 90].min
     set("metrics_retention_days", days.to_s)
   end
+
+  # 系统级私钥配置（使用加密存储）
+  # 注意：这里使用一个特殊的 SystemPrivateKey 模型来处理加密
+  def self.system_private_key
+    SystemPrivateKey.first&.private_key
+  end
+
+  def self.system_private_key=(key)
+    if key.present?
+      record = SystemPrivateKey.first_or_initialize
+      record.private_key = key
+      record.save!
+    else
+      SystemPrivateKey.destroy_all
+    end
+  end
+
+  def self.system_private_key_configured?
+    system_private_key.present?
+  end
 end

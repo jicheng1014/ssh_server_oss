@@ -72,9 +72,90 @@
     <% end %>
   </div>
 
+  <!-- 系统级 SSH 私钥配置 -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">系统级 SSH 私钥配置</h2>
+    <p class="text-gray-600 mb-4">系统级私钥优先级高于 Rails credentials，但低于环境变量配置。私钥使用 Active Record Encryption 加密存储。</p>
+    
+    <div class="mb-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-sm font-medium text-gray-700">当前状态：</span>
+        <% if @system_private_key_configured %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            已配置
+          </span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            未配置
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <div id="system-private-key-form" class="space-y-4">
+      <% if @system_private_key_configured %>
+        <!-- 显示模式：只显示"已配置"状态 -->
+        <div id="system-private-key-display" class="space-y-4" style="display: block;">
+          <div class="bg-gray-50 p-4 rounded border">
+            <p class="text-sm text-gray-700">系统私钥已配置（已加密存储）</p>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="showSystemPrivateKeyForm()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              修改
+            </button>
+            <%= button_to delete_system_private_key_settings_path, method: :delete, 
+                class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded",
+                data: { confirm: "确定要删除系统私钥吗？" } do %>
+              删除
+            <% end %>
+          </div>
+        </div>
+
+        <!-- 编辑模式：要求用户重新输入私钥 -->
+        <div id="system-private-key-edit" class="space-y-4" style="display: none;">
+          <%= form_with url: update_system_private_key_settings_path, method: :patch, class: "space-y-4", data: { turbo: false } do |form| %>
+            <div>
+              <%= form.text_area :system_private_key, 
+                  rows: 15,
+                  class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border font-mono text-xs",
+                  placeholder: "请输入 SSH 私钥内容..." %>
+              <p class="mt-1 text-sm text-gray-500">出于安全考虑，请重新输入完整的私钥内容</p>
+            </div>
+            <div class="flex gap-2">
+              <%= form.submit "确定", class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded cursor-pointer" %>
+              <button type="button" onclick="hideSystemPrivateKeyForm()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                取消
+              </button>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <!-- 未配置时显示表单 -->
+        <%= form_with url: update_system_private_key_settings_path, method: :patch, class: "space-y-4" do |form| %>
+          <div>
+            <%= form.text_area :system_private_key, 
+                rows: 15,
+                class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border font-mono text-xs",
+                placeholder: "请输入 SSH 私钥内容..." %>
+            <p class="mt-1 text-sm text-gray-500">私钥将使用 Active Record Encryption 加密存储</p>
+          </div>
+          <div>
+            <%= form.submit "保存", class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded cursor-pointer" %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
   <!-- SSH 私钥配置说明 -->
   <div class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-semibold mb-4">SSH 私钥配置</h2>
+    <h2 class="text-xl font-semibold mb-4">SSH 私钥配置说明</h2>
     
     <div class="mb-4">
       <div class="flex items-center gap-2 mb-2">
@@ -140,8 +221,39 @@ bin/rails ssh:import[/path/to/your/private_key]</code></pre>
 
     <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
       <p class="text-sm text-blue-800">
-        <strong>注意：</strong>配置优先级从高到低为：Rails Credentials > SSH_PRIVATE_KEY > SSH_KEY_PATH > 默认文件位置
+        <strong>注意：</strong>配置优先级从高到低为：SSH_PRIVATE_KEY > SSH_KEY_PATH > <strong>系统配置（已加密）</strong> > Rails Credentials > 默认文件位置
       </p>
     </div>
   </div>
 </div>
+
+<script>
+  function showSystemPrivateKeyForm() {
+    const display = document.getElementById('system-private-key-display');
+    const edit = document.getElementById('system-private-key-edit');
+    if (display && edit) {
+      display.style.display = 'none';
+      edit.style.display = 'block';
+    }
+  }
+
+  function hideSystemPrivateKeyForm() {
+    const display = document.getElementById('system-private-key-display');
+    const edit = document.getElementById('system-private-key-edit');
+    if (display && edit) {
+      edit.style.display = 'none';
+      display.style.display = 'block';
+    }
+  }
+
+  // 确保页面加载时显示正确的状态
+  document.addEventListener('DOMContentLoaded', function() {
+    const display = document.getElementById('system-private-key-display');
+    const edit = document.getElementById('system-private-key-edit');
+    if (display && edit) {
+      // 如果已配置，确保显示模式可见，编辑模式隐藏
+      display.style.display = 'block';
+      edit.style.display = 'none';
+    }
+  });
+</script>
