@@ -84,7 +84,7 @@
         <% @metrics.each do |metric| %>
           <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <%= metric.created_at.strftime("%Y-%m-%d %H:%M") %>
+              <%= metric.created_at.in_time_zone("Asia/Shanghai").strftime("%Y-%m-%d %H:%M") %>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               <%= metric.cpu_usage.round(1) %>%

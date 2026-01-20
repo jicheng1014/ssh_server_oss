@@ -219,10 +219,12 @@
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div>
-                    <div class="text-sm font-medium text-gray-900">
-                      <%= server.name %>
-                      <% if server.country_flag.present? %>
-                        <span><%= server.country_flag %></span>
+                    <div class="text-sm font-medium">
+                      <%= link_to server_path(server), class: "text-blue-600 hover:text-blue-800 hover:underline", data: { turbo_frame: "_top" } do %>
+                        <%= server.name %>
+                        <% if server.country_flag.present? %>
+                          <span><%= server.country_flag %></span>
+                        <% end %>
                       <% end %>
                     </div>
                     <div class="text-xs text-gray-500"><%= server.provider %></div>
