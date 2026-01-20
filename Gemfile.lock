@@ -203,6 +203,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.0-x86_64-linux-musl)
       racc (~> 1.4)
+    openssl (4.0.0)
     ostruct (0.6.3)
     parallel (1.27.0)
     parser (3.3.10.1)
@@ -392,6 +393,7 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin-24
+  arm64-darwin-25
   x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
@@ -407,6 +409,7 @@ DEPENDENCIES
   jbuilder
   kamal
   net-ssh
+  openssl
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.2)
