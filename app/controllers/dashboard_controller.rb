@@ -22,5 +22,17 @@ class DashboardController < ApplicationController
     @avg_cpu_usage = @server_stats.any? ? (@server_stats.sum { |s| s[:metric].cpu_usage.to_f } / @server_stats.size) : 0
     @memory_percent = @total_memory > 0 ? (@used_memory / @total_memory * 100) : 0
     @disk_percent = @total_disk > 0 ? (@used_disk / @total_disk * 100) : 0
+
+    # Calculate provider distribution
+    @provider_stats = @servers.group(:provider).count
+    @provider_stats["未设置"] = @provider_stats.delete(nil) || 0
+
+    # Calculate OS distribution
+    @os_stats = @servers.group(:os_name).count
+    @os_stats["未知"] = @os_stats.delete(nil) || 0
+
+    # Calculate country/region distribution
+    @country_stats = @servers.group(:country_code).count
+    @country_stats["未知"] = @country_stats.delete(nil) || 0
   end
 end

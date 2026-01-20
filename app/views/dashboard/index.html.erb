@@ -99,6 +99,102 @@
     </div>
   </div>
 
+  <!-- Charts -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Provider Chart -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">服务商分布</h2>
+      <div class="relative h-64">
+        <canvas 
+          data-controller="chart"
+          data-chart-type-value="pie"
+          data-chart-data-value='<%= {
+            labels: @provider_stats.keys.to_a,
+            datasets: [{
+              data: @provider_stats.values.to_a,
+              backgroundColor: [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'
+              ]
+            }]
+          }.to_json.html_safe %>'
+          data-chart-options-value='<%= {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }.to_json.html_safe %>'
+        ></canvas>
+      </div>
+    </div>
+
+    <!-- OS Chart -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">操作系统分布</h2>
+      <div class="relative h-64">
+        <canvas 
+          data-controller="chart"
+          data-chart-type-value="pie"
+          data-chart-data-value='<%= {
+            labels: @os_stats.keys.to_a,
+            datasets: [{
+              data: @os_stats.values.to_a,
+              backgroundColor: [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1',
+                '#14B8A6', '#A855F7', '#F43F5E', '#FB923C', '#4ADE80'
+              ]
+            }]
+          }.to_json.html_safe %>'
+          data-chart-options-value='<%= {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }.to_json.html_safe %>'
+        ></canvas>
+      </div>
+    </div>
+
+    <!-- Country Chart -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">地区分布</h2>
+      <div class="relative h-64">
+        <canvas 
+          data-controller="chart"
+          data-chart-type-value="pie"
+          data-chart-data-value='<%= {
+            labels: @country_stats.keys.to_a.map { |code| code == "未知" ? "未知" : "#{country_flag(code)} #{code}" },
+            datasets: [{
+              data: @country_stats.values.to_a,
+              backgroundColor: [
+                '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1',
+                '#14B8A6', '#A855F7', '#F43F5E', '#FB923C', '#4ADE80',
+                '#22C55E', '#FBBF24', '#60A5FA', '#A78BFA', '#F472B6'
+              ]
+            }]
+          }.to_json.html_safe %>'
+          data-chart-options-value='<%= {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }.to_json.html_safe %>'
+        ></canvas>
+      </div>
+    </div>
+  </div>
+
   <!-- Per Server Breakdown -->
   <div class="bg-white rounded-lg shadow">
     <div class="p-4 border-b">
