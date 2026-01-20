@@ -23,22 +23,22 @@ class PsCommandService
       result = case @format
       when "aux"
         begin
-          ssh.exec!("ps aux 2>/dev/null | head -50")
+          ssh.exec!("ps aux 2>/dev/null")
         rescue
-          ssh.exec!("ps -ef 2>/dev/null | head -50")
+          ssh.exec!("ps -ef 2>/dev/null")
         end
       when "ef"
         begin
-          ssh.exec!("ps -ef 2>/dev/null | head -50")
+          ssh.exec!("ps -ef 2>/dev/null")
         rescue
-          ssh.exec!("ps aux 2>/dev/null | head -50")
+          ssh.exec!("ps aux 2>/dev/null")
         end
       else
         # 默认使用 ps aux
         begin
-          ssh.exec!("ps aux 2>/dev/null | head -50")
+          ssh.exec!("ps aux 2>/dev/null")
         rescue
-          ssh.exec!("ps -ef 2>/dev/null | head -50")
+          ssh.exec!("ps -ef 2>/dev/null")
         end
       end
       
