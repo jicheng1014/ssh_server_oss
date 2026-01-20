@@ -20,7 +20,6 @@ Rails.application.routes.draw do
       get :export_servers
       get :import_servers
       post :import_servers_process
-      get :system_private_key
       patch :update_system_private_key
       delete :delete_system_private_key
     end

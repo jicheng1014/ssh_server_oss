@@ -5,10 +5,7 @@ class SettingsController < ApplicationController
     @ssh_key_source = SshKeyService.source
     @ssh_key_configured = SshKeyService.configured?
     @system_private_key_configured = SystemSetting.system_private_key_configured?
-    # 获取私钥用于显示（如果已配置）
-    if @system_private_key_configured
-      @system_private_key = SystemSetting.system_private_key
-    end
+    # 出于安全考虑，不将私钥传递到视图层
   end
 
   def update_monitor_interval
@@ -159,15 +156,6 @@ class SettingsController < ApplicationController
       redirect_to import_servers_settings_path, alert: "YAML 文件格式错误：#{e.message}"
     rescue => e
       redirect_to import_servers_settings_path, alert: "导入失败：#{e.message}"
-    end
-  end
-
-  # 获取系统私钥（用于编辑时显示全文）
-  def system_private_key
-    if SystemSetting.system_private_key_configured?
-      render json: { private_key: SystemSetting.system_private_key }
-    else
-      render json: { private_key: nil }
     end
   end
 

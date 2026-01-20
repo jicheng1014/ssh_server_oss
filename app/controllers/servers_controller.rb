@@ -120,6 +120,12 @@ class ServersController < ApplicationController
   end
 
   def server_params
-    params.require(:server).permit(:name, :host, :port, :username, :active, :provider, :password, :private_key, :notes)
+    permitted = params.require(:server).permit(:name, :host, :port, :username, :active, :provider, :password, :private_key, :notes)
+    # 编辑时，空的密码和私钥不应覆盖现有值
+    if action_name == "update"
+      permitted.delete(:password) if permitted[:password].blank?
+      permitted.delete(:private_key) if permitted[:private_key].blank?
+    end
+    permitted
   end
 end
