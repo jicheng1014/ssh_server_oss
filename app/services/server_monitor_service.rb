@@ -59,7 +59,7 @@ class ServerMonitorService
 
   def fetch_os_info(ssh)
     # Get OS name and version from /etc/os-release
-    os_release = ssh.exec!("cat /etc/os-release 2>/dev/null || cat /etc/redhat-release 2>/dev/null || echo ''")
+    os_release = exec_command(ssh, "cat /etc/os-release 2>/dev/null || cat /etc/redhat-release 2>/dev/null || echo ''")
 
     os_name = nil
     os_version = nil
@@ -79,7 +79,7 @@ class ServerMonitorService
     end
 
     # Get kernel version
-    kernel_version = ssh.exec!("uname -r").strip rescue nil
+    kernel_version = exec_command(ssh, "uname -r").strip rescue nil
 
     @server.update(
       os_name: os_name,
@@ -91,44 +91,50 @@ class ServerMonitorService
   end
 
   def fetch_cpu_cores(ssh)
-    result = ssh.exec!("nproc")
+    result = exec_command(ssh, "nproc")
     result.to_i
   rescue
     1
   end
 
   def fetch_cpu_usage(ssh)
-    result = ssh.exec!("top -bn1 | grep 'Cpu(s)' | awk '{print $2}'")
+    result = exec_command(ssh, "top -bn1 | grep 'Cpu(s)' | awk '{print $2}'")
     result.to_f
   rescue
     0.0
   end
 
   def fetch_memory_usage(ssh)
-    result = ssh.exec!("free -m | awk 'NR==2{print $3}'")
+    result = exec_command(ssh, "free -m | awk 'NR==2{print $3}'")
     result.to_f
   rescue
     0.0
   end
 
   def fetch_memory_total(ssh)
-    result = ssh.exec!("free -m | awk 'NR==2{print $2}'")
+    result = exec_command(ssh, "free -m | awk 'NR==2{print $2}'")
     result.to_f
   rescue
     0.0
   end
 
   def fetch_disk_usage(ssh)
-    result = ssh.exec!("df -BG / | awk 'NR==2{print $3}' | sed 's/G//'")
+    result = exec_command(ssh, "df -BG / | awk 'NR==2{print $3}' | sed 's/G//'")
     result.to_f
   rescue
     0.0
   end
 
   def fetch_disk_total(ssh)
-    result = ssh.exec!("df -BG / | awk 'NR==2{print $2}' | sed 's/G//'")
+    result = exec_command(ssh, "df -BG / | awk 'NR==2{print $2}' | sed 's/G//'")
     result.to_f
   rescue
     0.0
+  end
+
+  # Execute command with LC_ALL=C to avoid locale warnings
+  # and ensure consistent output format
+  def exec_command(ssh, command)
+    ssh.exec!("LC_ALL=C #{command}")
   end
 end
