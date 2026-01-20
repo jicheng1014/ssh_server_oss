@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: servers
+# Database name: primary
+#
+#  id              :integer          not null, primary key
+#  active          :boolean          default(TRUE)
+#  country_code    :string
+#  host            :string           not null
+#  kernel_version  :string
+#  last_checked_at :datetime
+#  last_error      :text
+#  name            :string           not null
+#  os_name         :string
+#  os_version      :string
+#  password        :text
+#  port            :integer          default(22)
+#  position        :integer          default(0), not null
+#  private_key     :text
+#  provider        :string
+#  username        :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+# Indexes
+#
+#  index_servers_on_host  (host) UNIQUE
+#
 class Server < ApplicationRecord
   PROVIDERS = %w[AWS Bandwagon Aliyun Tencent].freeze
 

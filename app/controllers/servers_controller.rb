@@ -9,8 +9,8 @@ class ServersController < ApplicationController
     @servers = @servers.where("host LIKE ?", "%#{params[:ip]}%") if params[:ip].present?
 
     @countries = Server.where.not(country_code: nil).distinct.pluck(:country_code).sort
-    @providers = Server.where.not(provider: [nil, ""]).distinct.pluck(:provider).sort
-    @os_names = Server.where.not(os_name: [nil, ""]).distinct.pluck(:os_name).sort
+    @providers = Server.where.not(provider: [ nil, "" ]).distinct.pluck(:provider).sort
+    @os_names = Server.where.not(os_name: [ nil, "" ]).distinct.pluck(:os_name).sort
   end
 
   def show
