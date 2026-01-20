@@ -36,7 +36,7 @@ class TopCommandService
           end
         end
       end
-      
+
       {
         success: true,
         output: result.to_s.strip,

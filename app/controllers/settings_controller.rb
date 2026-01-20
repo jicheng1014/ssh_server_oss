@@ -1,6 +1,7 @@
 class SettingsController < ApplicationController
   def index
     @monitor_interval = SystemSetting.monitor_interval
+    @metrics_retention_days = SystemSetting.metrics_retention_days
     @ssh_key_source = SshKeyService.source
     @ssh_key_configured = SshKeyService.configured?
   end
@@ -17,6 +18,20 @@ class SettingsController < ApplicationController
     SystemSetting.monitor_interval = interval
 
     redirect_to settings_path, notice: "监控频率已更新为每 #{interval} 分钟，将在下次检查时生效"
+  end
+
+  def update_metrics_retention_days
+    days = params[:metrics_retention_days].to_i
+
+    if days < 1 || days > 90
+      redirect_to settings_path, alert: "日志保留天数必须在 1-90 天之间"
+      return
+    end
+
+    # 保存到数据库
+    SystemSetting.metrics_retention_days = days
+
+    redirect_to settings_path, notice: "日志保留天数已更新为 #{days} 天，清理任务将在每天凌晨 3 点自动运行"
   end
 
   def export_servers

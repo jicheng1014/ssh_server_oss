@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   resources :settings, only: [:index] do
     collection do
       patch :update_monitor_interval
+      patch :update_metrics_retention_days
       get :export_servers
       get :import_servers
       post :import_servers_process

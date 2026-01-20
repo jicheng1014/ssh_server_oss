@@ -16,8 +16,14 @@ production:
   monitor_servers:
     class: MonitorServersJob
     schedule: every 1 minute
+  clean_old_metrics:
+    class: CleanOldMetricsJob
+    schedule: at 3am every day
 
 development:
   monitor_servers:
     class: MonitorServersJob
     schedule: every 1 minute
+  clean_old_metrics:
+    class: CleanOldMetricsJob
+    schedule: at 3am every day

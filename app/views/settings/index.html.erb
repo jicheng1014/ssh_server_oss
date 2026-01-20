@@ -53,6 +53,25 @@
     <% end %>
   </div>
 
+  <!-- 日志保留天数配置 -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">检测日志保留</h2>
+    <p class="text-gray-600 mb-4">设置检测日志的保留天数，超过保留天数的日志将在每天凌晨 3 点自动清理</p>
+    
+    <%= form_with url: update_metrics_retention_days_settings_path, method: :patch, class: "space-y-4" do |form| %>
+      <div class="flex items-center gap-4">
+        <div class="flex-1">
+          <%= form.number_field :metrics_retention_days, value: @metrics_retention_days, min: 1, max: 90, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border" %>
+          <p class="mt-1 text-sm text-gray-500">范围：1-90 天</p>
+        </div>
+        <%= form.submit "保存", class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 rounded cursor-pointer" %>
+      </div>
+      <p class="text-sm text-gray-500">
+        当前设置：保留 <strong><%= @metrics_retention_days %></strong> 天的检测日志，清理任务每天凌晨 3 点自动运行
+      </p>
+    <% end %>
+  </div>
+
   <!-- SSH 私钥配置说明 -->
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">SSH 私钥配置</h2>
