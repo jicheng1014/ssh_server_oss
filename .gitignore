@@ -28,10 +28,14 @@
 !/tmp/storage/
 !/tmp/storage/.keep
 
+
 /public/assets
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
+/config/deploy.yml
+/.kamal/secrets
+
 
 # Ignore SSH private keys
 /config/ssh/*
