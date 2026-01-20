@@ -22,13 +22,13 @@ class SettingsController < ApplicationController
   def export_servers
     servers_data = Server.ordered.map do |server|
       {
-        name: server.name,
-        host: server.host,
-        port: server.port,
-        username: server.username,
-        active: server.active,
-        provider: server.provider,
-        position: server.position
+        "name" => server.name,
+        "host" => server.host,
+        "port" => server.port,
+        "username" => server.username,
+        "active" => server.active,
+        "provider" => server.provider,
+        "position" => server.position
       }
     end
 
@@ -58,7 +58,8 @@ class SettingsController < ApplicationController
 
     begin
       yaml_content = uploaded_file.read
-      servers_data = YAML.safe_load(yaml_content)
+      # 允许 Symbol 类型，因为导出的 YAML 可能包含 Symbol key
+      servers_data = YAML.safe_load(yaml_content, permitted_classes: [Symbol], aliases: true)
 
       unless servers_data.is_a?(Array)
         redirect_to import_servers_settings_path, alert: "YAML 文件格式错误：应为服务器数组"
@@ -114,6 +115,10 @@ class SettingsController < ApplicationController
           if new_server.save
             imported_count += 1
             max_position = [max_position, new_server.position].max
+            # 如果服务器是活跃的，立即异步执行一次数据获取
+            if new_server.active?
+              RefreshServerJob.perform_later(new_server)
+            end
           else
             errors << "第 #{index + 1} 条记录导入失败：#{new_server.errors.full_messages.join(', ')}"
           end

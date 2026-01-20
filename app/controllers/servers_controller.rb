@@ -29,7 +29,11 @@ class ServersController < ApplicationController
     @server.position = Server.maximum(:position).to_i + 1
 
     if @server.save
-      redirect_to servers_path, notice: "服务器添加成功"
+      # 如果服务器是活跃的，立即异步执行一次数据获取
+      if @server.active?
+        RefreshServerJob.perform_later(@server)
+      end
+      redirect_to servers_path, notice: "服务器添加成功，正在获取数据..."
     else
       render :new, status: :unprocessable_entity
     end
