@@ -1,0 +1,128 @@
+<div class="max-w-4xl mx-auto space-y-6">
+  <h1 class="text-3xl font-bold mb-6">系统配置</h1>
+
+  <% if flash[:notice] %>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% if flash[:alert] %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <%= flash[:alert].html_safe %>
+    </div>
+  <% end %>
+
+  <!-- 服务器配置导入导出 -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">服务器配置管理</h2>
+    <p class="text-gray-600 mb-4">导出或导入服务器配置（仅包含用户录入的字段）</p>
+    
+    <div class="flex gap-4">
+      <%= link_to export_servers_settings_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        导出配置
+      <% end %>
+      <%= link_to import_servers_settings_path, class: "bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded inline-flex items-center" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+        </svg>
+        导入配置
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Job 运行频率控制 -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">监控任务频率</h2>
+    <p class="text-gray-600 mb-4">设置服务器监控任务的运行频率（单位：分钟）</p>
+    
+    <%= form_with url: update_monitor_interval_settings_path, method: :patch, class: "space-y-4" do |form| %>
+      <div class="flex items-center gap-4">
+        <div class="flex-1">
+          <%= form.number_field :monitor_interval, value: @monitor_interval, min: 1, max: 1440, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border" %>
+          <p class="mt-1 text-sm text-gray-500">范围：1-1440 分钟（1 分钟到 24 小时）</p>
+        </div>
+        <%= form.submit "保存", class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-6 rounded cursor-pointer" %>
+      </div>
+      <p class="text-sm text-gray-500">
+        当前设置：每 <strong><%= @monitor_interval %></strong> 分钟运行一次监控任务
+      </p>
+    <% end %>
+  </div>
+
+  <!-- SSH 私钥配置说明 -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">SSH 私钥配置</h2>
+    
+    <div class="mb-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-sm font-medium text-gray-700">当前状态：</span>
+        <% if @ssh_key_configured %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            已配置
+          </span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            未配置
+          </span>
+        <% end %>
+      </div>
+      <p class="text-sm text-gray-600">
+        <strong>配置来源：</strong><%= @ssh_key_source %>
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <div class="border-l-4 border-blue-500 pl-4">
+        <h3 class="font-semibold text-gray-900 mb-2">方式一：Rails Credentials（推荐用于生产环境）</h3>
+        <p class="text-sm text-gray-600 mb-2">私钥存储在加密的 credentials 文件中，安全性最高。</p>
+        <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto"><code>EDITOR=vim bin/rails credentials:edit
+
+# 添加:
+ssh:
+  private_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    ...your private key content...
+    -----END OPENSSH PRIVATE KEY-----</code></pre>
+      </div>
+
+      <div class="border-l-4 border-green-500 pl-4">
+        <h3 class="font-semibold text-gray-900 mb-2">方式二：环境变量 SSH_PRIVATE_KEY</h3>
+        <p class="text-sm text-gray-600 mb-2">直接设置私钥内容到环境变量。</p>
+        <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto"><code>export SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"</code></pre>
+      </div>
+
+      <div class="border-l-4 border-yellow-500 pl-4">
+        <h3 class="font-semibold text-gray-900 mb-2">方式三：环境变量 SSH_KEY_PATH</h3>
+        <p class="text-sm text-gray-600 mb-2">指定私钥文件的路径。</p>
+        <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto"><code>export SSH_KEY_PATH=~/.ssh/id_rsa</code></pre>
+      </div>
+
+      <div class="border-l-4 border-gray-400 pl-4">
+        <h3 class="font-semibold text-gray-900 mb-2">方式四：默认文件位置</h3>
+        <p class="text-sm text-gray-600 mb-2">将私钥文件放置在默认位置。</p>
+        <pre class="bg-gray-100 p-3 rounded text-xs overflow-x-auto"><code># 将私钥复制到项目目录
+cp ~/.ssh/id_rsa config/ssh/id_rsa
+
+# 或使用 Rails 命令导入
+bin/rails ssh:import
+bin/rails ssh:import[/path/to/your/private_key]</code></pre>
+      </div>
+    </div>
+
+    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+      <p class="text-sm text-blue-800">
+        <strong>注意：</strong>配置优先级从高到低为：Rails Credentials > SSH_PRIVATE_KEY > SSH_KEY_PATH > 默认文件位置
+      </p>
+    </div>
+  </div>
+</div>

@@ -28,6 +28,7 @@
             <div class="hidden md:flex space-x-4">
               <%= link_to "服务器列表", servers_path, class: "text-gray-600 hover:text-gray-900 #{'font-medium text-blue-600' if controller_name == 'servers' && action_name == 'index'}" %>
               <%= link_to "资源汇总", dashboard_path, class: "text-gray-600 hover:text-gray-900 #{'font-medium text-blue-600' if controller_name == 'dashboard'}" %>
+              <%= link_to "系统配置", settings_path, class: "text-gray-600 hover:text-gray-900 #{'font-medium text-blue-600' if controller_name == 'settings'}" %>
             </div>
           </div>
           <div class="flex items-center">

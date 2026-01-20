@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_20_093852) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_20_100257) do
   create_table "server_metrics", force: :cascade do |t|
     t.integer "cpu_cores"
     t.float "cpu_usage"
@@ -41,6 +41,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_20_093852) do
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.index ["host"], name: "index_servers_on_host", unique: true
+  end
+
+  create_table "system_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.datetime "updated_at", null: false
+    t.text "value"
+    t.index ["key"], name: "index_system_settings_on_key", unique: true
   end
 
   add_foreign_key "server_metrics", "servers"

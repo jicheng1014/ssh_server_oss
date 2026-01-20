@@ -11,6 +11,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :settings, only: [:index] do
+    collection do
+      patch :update_monitor_interval
+      get :export_servers
+      get :import_servers
+      post :import_servers_process
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   root "servers#index"
