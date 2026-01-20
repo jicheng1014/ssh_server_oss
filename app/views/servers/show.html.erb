@@ -66,6 +66,9 @@
   </div>
 <% end %>
 
+<!-- Notes Editor -->
+<%= render "servers/notes", server: @server %>
+
 <!-- Top Command -->
 <div class="bg-white rounded-lg shadow p-6 mb-6" data-controller="top" data-top-server-id-value="<%= @server.id %>" data-top-interval-value="2000">
   <div class="flex justify-between items-center mb-4">

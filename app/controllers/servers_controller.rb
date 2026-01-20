@@ -40,10 +40,14 @@ class ServersController < ApplicationController
   end
 
   def update
-    if @server.update(server_params)
-      redirect_to servers_path, notice: "服务器更新成功"
-    else
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @server.update(server_params)
+        format.html { redirect_to servers_path, notice: "服务器更新成功" }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@server, :notes), partial: "servers/notes", locals: { server: @server }) }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@server, :notes), partial: "servers/notes", locals: { server: @server }), status: :unprocessable_entity }
+      end
     end
   end
 
@@ -93,6 +97,6 @@ class ServersController < ApplicationController
   end
 
   def server_params
-    params.require(:server).permit(:name, :host, :port, :username, :active, :provider, :password, :private_key)
+    params.require(:server).permit(:name, :host, :port, :username, :active, :provider, :password, :private_key, :notes)
   end
 end

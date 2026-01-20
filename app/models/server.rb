@@ -2,6 +2,7 @@ class Server < ApplicationRecord
   PROVIDERS = %w[AWS Bandwagon Aliyun Tencent].freeze
 
   has_many :server_metrics, dependent: :destroy
+  has_rich_text :notes
 
   # 使用 Active Record Encryption 加密敏感字段
   encrypts :password, :private_key
