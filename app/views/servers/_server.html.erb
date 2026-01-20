@@ -1,0 +1,84 @@
+<%= turbo_frame_tag dom_id(server) do %>
+  <div id="server_<%= server.id %>" class="bg-white rounded-lg shadow p-6 cursor-move" data-server-id="<%= server.id %>">
+    <div class="flex justify-between items-start mb-4">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800">
+          <%= server.name %>
+          <% if server.country_flag.present? %>
+            <span title="<%= server.country_code %>"><%= server.country_flag %></span>
+          <% end %>
+        </h2>
+        <p class="text-sm text-gray-500"><%= server.username %>@<span data-ip-toggle-target="ip" data-full-ip="<%= server.host %>" data-masked-ip="<%= server.masked_host %>"><%= server.host %></span>:<%= server.port %></p>
+        <% if server.provider.present? %>
+          <span class="text-xs text-gray-400"><%= server.provider %></span>
+        <% end %>
+      </div>
+      <span class="px-2 py-1 text-xs rounded <%= server.active? ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+        <%= server.active? ? '活跃' : '停用' %>
+      </span>
+    </div>
+
+    <% if server.last_error.present? %>
+      <div class="bg-red-50 border border-red-200 rounded p-3 mb-3">
+        <div class="flex items-center">
+          <svg class="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-red-700 text-sm"><%= server.last_error %></span>
+        </div>
+        <% if server.last_checked_at %>
+          <p class="text-xs text-red-400 mt-1">检查于 <%= time_ago_in_words(server.last_checked_at) %>前</p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% metric = server.latest_metric %>
+    <% if metric %>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-600">CPU<% if metric.cpu_cores %> (<%= metric.cpu_cores %>核)<% end %></span>
+            <span class="font-medium"><%= metric.cpu_usage.round(1) %>%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-blue-500 h-2 rounded-full" style="width: <%= [metric.cpu_usage, 100].min %>%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-600">内存</span>
+            <span class="font-medium"><%= metric.memory_usage.round(0) %>MB / <%= metric.memory_total.round(0) %>MB</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-green-500 h-2 rounded-full" style="width: <%= [metric.memory_usage_percent, 100].min %>%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-600">磁盘</span>
+            <span class="font-medium"><%= metric.disk_usage_percent %>%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-yellow-500 h-2 rounded-full" style="width: <%= [metric.disk_usage_percent, 100].min %>%"></div>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-400 mt-2">
+          更新于 <%= time_ago_in_words(metric.created_at) %>前
+        </p>
+      </div>
+    <% else %>
+      <p class="text-gray-400 text-sm">暂无监控数据</p>
+    <% end %>
+
+    <div class="mt-4 pt-4 border-t flex justify-between">
+      <%= link_to "详情", server, class: "text-blue-500 hover:text-blue-700 text-sm", data: { turbo_frame: "_top" } %>
+      <div class="space-x-2">
+        <%= link_to "编辑", edit_server_path(server), class: "text-gray-500 hover:text-gray-700 text-sm", data: { turbo_frame: "_top" } %>
+        <%= button_to "删除", server, method: :delete, data: { turbo_confirm: "确定要删除吗?", turbo_frame: "_top" }, class: "text-red-500 hover:text-red-700 text-sm" %>
+      </div>
+    </div>
+  </div>
+<% end %>

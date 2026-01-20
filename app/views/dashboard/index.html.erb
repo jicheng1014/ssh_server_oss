@@ -1,0 +1,181 @@
+<h1 class="text-2xl font-bold text-gray-800 mb-6">资源汇总</h1>
+
+<% if @server_stats.any? %>
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">服务器数量</p>
+          <p class="text-3xl font-bold text-gray-800"><%= @server_stats.size %></p>
+        </div>
+        <div class="bg-purple-100 rounded-full p-3">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">CPU 总核心</p>
+          <p class="text-3xl font-bold text-blue-600"><%= @total_cpu_cores %> 核</p>
+          <p class="text-xs text-gray-400">平均使用 <%= @avg_cpu_usage.round(1) %>%</p>
+        </div>
+        <div class="bg-blue-100 rounded-full p-3">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">内存总量</p>
+          <p class="text-3xl font-bold text-green-600"><%= number_to_human_size(@total_memory * 1024 * 1024, precision: 1) %></p>
+          <p class="text-xs text-gray-400">已用 <%= number_to_human_size(@used_memory * 1024 * 1024, precision: 1) %> (<%= @memory_percent.round(1) %>%)</p>
+        </div>
+        <div class="bg-green-100 rounded-full p-3">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-gray-500">磁盘总量</p>
+          <p class="text-3xl font-bold text-yellow-600"><%= @total_disk.round(0) %> GB</p>
+          <p class="text-xs text-gray-400">已用 <%= @used_disk.round(0) %> GB (<%= @disk_percent.round(1) %>%)</p>
+        </div>
+        <div class="bg-yellow-100 rounded-full p-3">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Usage Bars -->
+  <div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">资源使用概览</h2>
+    <div class="space-y-4">
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span class="text-gray-600">CPU 平均使用率</span>
+          <span class="font-medium"><%= @avg_cpu_usage.round(1) %>%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+          <div class="bg-blue-500 h-4 rounded-full transition-all" style="width: <%= [@avg_cpu_usage, 100].min %>%"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span class="text-gray-600">内存使用率</span>
+          <span class="font-medium"><%= @memory_percent.round(1) %>%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+          <div class="bg-green-500 h-4 rounded-full transition-all" style="width: <%= [@memory_percent, 100].min %>%"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span class="text-gray-600">磁盘使用率</span>
+          <span class="font-medium"><%= @disk_percent.round(1) %>%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+          <div class="bg-yellow-500 h-4 rounded-full transition-all" style="width: <%= [@disk_percent, 100].min %>%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per Server Breakdown -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="p-4 border-b">
+      <h2 class="text-lg font-semibold text-gray-800">各服务器详情</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">服务器</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CPU</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">内存</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">磁盘</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">更新时间</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @server_stats.each do |stat| %>
+            <% server = stat[:server] %>
+            <% metric = stat[:metric] %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">
+                      <%= server.name %>
+                      <% if server.country_flag.present? %>
+                        <span><%= server.country_flag %></span>
+                      <% end %>
+                    </div>
+                    <div class="text-xs text-gray-500"><%= server.provider %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"><%= metric.cpu_usage.round(1) %>%</div>
+                <div class="text-xs text-gray-500"><%= metric.cpu_cores || '-' %> 核</div>
+                <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div class="bg-blue-500 h-1.5 rounded-full" style="width: <%= [metric.cpu_usage, 100].min %>%"></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"><%= metric.memory_usage_percent %>%</div>
+                <div class="text-xs text-gray-500"><%= metric.memory_usage.round(0) %> / <%= metric.memory_total.round(0) %> MB</div>
+                <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div class="bg-green-500 h-1.5 rounded-full" style="width: <%= [metric.memory_usage_percent, 100].min %>%"></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"><%= metric.disk_usage_percent %>%</div>
+                <div class="text-xs text-gray-500"><%= metric.disk_usage.round(0) %> / <%= metric.disk_total.round(0) %> GB</div>
+                <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div class="bg-yellow-500 h-1.5 rounded-full" style="width: <%= [metric.disk_usage_percent, 100].min %>%"></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= time_ago_in_words(metric.created_at) %>前
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot class="bg-gray-50">
+          <tr class="font-medium">
+            <td class="px-6 py-3 text-sm text-gray-700">合计</td>
+            <td class="px-6 py-3 text-sm text-gray-700"><%= @total_cpu_cores %> 核</td>
+            <td class="px-6 py-3 text-sm text-gray-700"><%= @used_memory.round(0) %> / <%= @total_memory.round(0) %> MB</td>
+            <td class="px-6 py-3 text-sm text-gray-700"><%= @used_disk.round(0) %> / <%= @total_disk.round(0) %> GB</td>
+            <td class="px-6 py-3"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="text-center py-12 bg-white rounded-lg shadow">
+    <p class="text-gray-500 mb-4">暂无服务器数据</p>
+    <p class="text-sm text-gray-400">请先添加服务器并刷新数据</p>
+    <%= link_to "前往服务器列表", servers_path, class: "mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+<% end %>

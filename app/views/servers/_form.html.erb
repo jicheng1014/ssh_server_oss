@@ -1,0 +1,51 @@
+<%= form_with model: server, class: "space-y-6" do |form| %>
+  <% if server.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <ul class="list-disc list-inside">
+        <% server.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, "名称", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border" %>
+  </div>
+
+  <div>
+    <%= form.label :host, "主机地址", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_field :host, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border", placeholder: "例如: 192.168.1.1 或 example.com" %>
+  </div>
+
+  <div>
+    <%= form.label :port, "端口", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.number_field :port, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border" %>
+  </div>
+
+  <div>
+    <%= form.label :username, "用户名", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_field :username, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border" %>
+  </div>
+
+  <div>
+    <%= form.label :provider, "服务商", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_field :provider, list: "providers", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border", placeholder: "选择或输入服务商" %>
+    <datalist id="providers">
+      <% Server::PROVIDERS.each do |provider| %>
+        <option value="<%= provider %>">
+      <% end %>
+    </datalist>
+  </div>
+
+  <div class="flex items-center">
+    <%= form.check_box :active, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+    <%= form.label :active, "启用监控", class: "ml-2 block text-sm text-gray-700" %>
+  </div>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to "取消", servers_path, class: "px-4 py-2 text-gray-700 hover:text-gray-900" %>
+    <%= form.submit class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" %>
+  </div>
+<% end %>

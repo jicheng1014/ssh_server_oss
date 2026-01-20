@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ruby:*)",
+      "Bash(rails --version:*)",
+      "Bash(gem install:*)",
+      "Bash(rails new:*)",
+      "Bash(bundle install:*)",
+      "Bash(bin/rails generate:*)",
+      "Bash(bin/rails db:migrate:*)",
+      "Bash(bin/rails routes:*)",
+      "Bash(bin/rails runner:*)",
+      "Bash(bin/rails db:prepare:*)",
+      "Bash(bin/rails db:migrate:status:*)",
+      "Bash(bundle exec rails:*)",
+      "Bash(bin/rails:*)",
+      "Bash(sqlite3:*)",
+      "Bash(bin/importmap pin:*)"
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">
+        <%= @server.name %>
+        <% if @server.country_flag.present? %>
+          <span title="<%= @server.country_code %>"><%= @server.country_flag %></span>
+        <% end %>
+      </h1>
+      <p class="text-gray-500"><%= @server.username %>@<%= @server.host %>:<%= @server.port %></p>
+      <% if @server.provider.present? %>
+        <span class="text-sm text-gray-400"><%= @server.provider %></span>
+      <% end %>
+    </div>
+    <div class="flex space-x-2">
+      <%= button_to "立即刷新", refresh_server_path(@server), method: :post, class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to "编辑", edit_server_path(@server), class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  </div>
+
+  <% if @server.latest_metric %>
+    <% metric = @server.latest_metric %>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-blue-50 rounded-lg p-4">
+        <p class="text-sm text-gray-600">CPU 使用率<% if metric.cpu_cores %> (<%= metric.cpu_cores %>核)<% end %></p>
+        <p class="text-2xl font-bold text-blue-600"><%= metric.cpu_usage.round(1) %>%</p>
+      </div>
+      <div class="bg-green-50 rounded-lg p-4">
+        <p class="text-sm text-gray-600">内存使用</p>
+        <p class="text-2xl font-bold text-green-600"><%= metric.memory_usage_percent %>%</p>
+        <p class="text-xs text-gray-500"><%= metric.memory_usage.round(0) %>MB / <%= metric.memory_total.round(0) %>MB</p>
+      </div>
+      <div class="bg-yellow-50 rounded-lg p-4">
+        <p class="text-sm text-gray-600">磁盘使用</p>
+        <p class="text-2xl font-bold text-yellow-600"><%= metric.disk_usage_percent %>%</p>
+        <p class="text-xs text-gray-500"><%= metric.disk_usage.round(0) %>GB / <%= metric.disk_total.round(0) %>GB</p>
+      </div>
+    </div>
+  <% else %>
+    <p class="text-gray-400">暂无监控数据，点击"立即刷新"获取</p>
+  <% end %>
+</div>
+
+<!-- System Info -->
+<% if @server.os_name.present? %>
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">系统信息</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <p class="text-sm text-gray-500">操作系统</p>
+        <p class="text-lg font-medium text-gray-800"><%= @server.os_name %></p>
+      </div>
+      <% if @server.os_version.present? %>
+        <div>
+          <p class="text-sm text-gray-500">系统版本</p>
+          <p class="text-lg font-medium text-gray-800"><%= @server.os_version %></p>
+        </div>
+      <% end %>
+      <% if @server.kernel_version.present? %>
+        <div>
+          <p class="text-sm text-gray-500">内核版本</p>
+          <p class="text-lg font-medium text-gray-800"><%= @server.kernel_version %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="bg-white rounded-lg shadow">
+  <div class="p-4 border-b">
+    <h2 class="text-lg font-semibold text-gray-800">历史记录</h2>
+  </div>
+  <% if @metrics.any? %>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">时间</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CPU</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">内存</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">磁盘</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @metrics.each do |metric| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= metric.created_at.strftime("%Y-%m-%d %H:%M") %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= metric.cpu_usage.round(1) %>%
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= metric.memory_usage_percent %>%
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= metric.disk_usage_percent %>%
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="p-4 text-center text-gray-400">暂无历史记录</div>
+  <% end %>
+</div>

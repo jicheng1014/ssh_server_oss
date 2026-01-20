@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  server: one
+  cpu_usage: 1.5
+  memory_usage: 1.5
+  memory_total: 1.5
+  disk_usage: 1.5
+  disk_total: 1.5
+
+two:
+  server: two
+  cpu_usage: 1.5
+  memory_usage: 1.5
+  memory_total: 1.5
+  disk_usage: 1.5
+  disk_total: 1.5
