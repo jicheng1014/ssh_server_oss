@@ -144,11 +144,21 @@ class ServerMonitorService
   def filter_shell_warnings(output)
     return "" if output.blank?
 
-    output.lines.reject do |line|
-      line.include?("warning:") ||
-      line.include?("/etc/profile") ||
-      line.include?("setlocale") ||
-      line.include?("cannot change locale")
+    result = output.dup
+
+    # Remove inline locale warnings (warning and output on same line)
+    # Pattern: /path/to/script.sh: line N: warning: setlocale: ... (locale)
+    result.gsub!(%r{/etc/profile[^\n]*warning:[^\n]*cannot change locale[^\n]*\([^)]+\)\s*}i, "")
+
+    # Also filter complete warning lines
+    result = result.lines.reject do |line|
+      line.include?("warning:") && (
+        line.include?("/etc/profile") ||
+        line.include?("setlocale") ||
+        line.include?("cannot change locale")
+      )
     end.join
+
+    result.strip
   end
 end
