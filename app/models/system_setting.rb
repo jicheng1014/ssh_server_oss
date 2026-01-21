@@ -72,11 +72,52 @@ class SystemSetting < ApplicationRecord
 
   def self.system_private_key=(key)
     if key.present?
-      record = SystemPrivateKey.first_or_initialize
-      record.private_key = key
+      # 尝试获取并更新现有记录，如果失败则清理并创建新记录
+      record = nil
+      begin
+        existing = SystemPrivateKey.first
+        if existing
+          # 尝试读取私钥以验证是否可解密
+          begin
+            _ = existing.private_key
+            # 如果能解密，更新现有记录
+            record = existing
+            record.private_key = key
+            record.save!
+            return
+          rescue ActiveRecord::Encryption::Errors::Decryption => e
+            # 如果无法解密，删除旧记录
+            Rails.logger.warn "检测到无法解密的旧私钥记录，将删除并创建新记录: #{e.message}"
+            cleanup_all_records
+          end
+        end
+      rescue ActiveRecord::Encryption::Errors::Decryption => e
+        # 如果查询时遇到解密错误，先清理所有记录
+        Rails.logger.warn "查询私钥记录时遇到解密错误，将清理所有记录: #{e.message}"
+        cleanup_all_records
+      end
+      
+      # 创建新记录（如果没有可更新的现有记录）
+      record = SystemPrivateKey.new(private_key: key)
       record.save!
     else
+      # 删除私钥时，即使解密失败也要删除记录
+      cleanup_all_records
+    end
+  end
+
+  def self.cleanup_all_records
+    # 尝试安全地删除所有记录，如果遇到解密错误则使用 SQL 直接删除
+    begin
       SystemPrivateKey.destroy_all
+    rescue ActiveRecord::Encryption::Errors::Decryption => e
+      # 如果删除时遇到解密错误（可能在查询时触发），直接使用 SQL 删除
+      Rails.logger.warn "检测到无法解密的私钥记录，使用 SQL 直接删除: #{e.message}"
+      SystemPrivateKey.connection.execute("DELETE FROM system_private_keys")
+    rescue => e
+      # 捕获其他可能的错误
+      Rails.logger.error "清理私钥记录时出错: #{e.message}"
+      SystemPrivateKey.connection.execute("DELETE FROM system_private_keys")
     end
   end
 
