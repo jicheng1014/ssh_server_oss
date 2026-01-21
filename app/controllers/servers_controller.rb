@@ -91,13 +91,14 @@ class ServersController < ApplicationController
   end
 
   def delete_private_key
-    if @server.private_key.blank?
-      redirect_to @server, alert: "该服务器未配置特殊私钥"
+    if @server.private_key.blank? && @server.password.blank?
+      redirect_to @server, alert: "该服务器未配置特殊私钥和密码"
       return
     end
 
-    @server.update(private_key: nil)
-    redirect_to @server, notice: "服务器的特殊私钥已删除，将使用全局配置的私钥"
+    # 同时清除私钥和密码
+    @server.update(private_key: nil, password: nil)
+    redirect_to @server, notice: "服务器的特殊私钥和密码已删除，将使用全局配置的私钥"
   end
 
   def refresh_all

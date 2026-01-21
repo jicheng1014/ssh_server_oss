@@ -94,10 +94,10 @@
           </span>
         <% end %>
       </div>
-      <% if @server.private_key.present? %>
-        <%= button_to "删除特殊私钥", delete_private_key_server_path(@server), 
+      <% if @server.private_key.present? || @server.password.present? %>
+        <%= button_to "清除认证信息", delete_private_key_server_path(@server), 
             method: :delete, 
-            data: { confirm: "确定要删除该服务器的特殊私钥吗？删除后将使用全局配置的私钥。" },
+            data: { confirm: "确定要清除该服务器的特殊私钥和密码吗？清除后将使用全局配置的私钥。" },
             class: "bg-red-500 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded text-sm" %>
       <% end %>
     </div>
