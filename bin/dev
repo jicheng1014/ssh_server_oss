@@ -5,6 +5,13 @@ if ! gem list foreman -i --silent; then
   gem install foreman
 fi
 
+# Load .env file if it exists
+if [ -f .env ]; then
+  set -a
+  . .env
+  set +a
+fi
+
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 

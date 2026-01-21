@@ -20,15 +20,22 @@
 
     <% if server.last_error.present? %>
       <div class="bg-red-50 border border-red-200 rounded p-3 mb-3">
-        <div class="flex items-center">
-          <svg class="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-start">
+          <svg class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          <span class="text-red-700 text-sm"><%= server.last_error %></span>
+          <div class="flex-1">
+            <span class="text-red-700 text-sm font-medium"><%= server.last_error %></span>
+            <% if server.last_error.include?("认证失败") %>
+              <p class="text-xs text-red-600 mt-1">
+                提示：请检查服务器的 SSH 私钥或密码是否正确，或前往<a href="<%= edit_server_path(server) %>" class="underline font-medium">编辑服务器</a>配置认证信息
+              </p>
+            <% end %>
+            <% if server.last_checked_at %>
+              <p class="text-xs text-red-400 mt-1">检查于 <%= time_ago_in_words(server.last_checked_at) %>前</p>
+            <% end %>
+          </div>
         </div>
-        <% if server.last_checked_at %>
-          <p class="text-xs text-red-400 mt-1">检查于 <%= time_ago_in_words(server.last_checked_at) %>前</p>
-        <% end %>
       </div>
     <% end %>
 

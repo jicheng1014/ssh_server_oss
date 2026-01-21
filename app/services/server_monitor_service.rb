@@ -40,15 +40,30 @@ class ServerMonitorService
       }
     end
   rescue Net::SSH::AuthenticationFailed => e
-    handle_error("认证失败: #{e.message}")
+    # 提取更友好的错误信息
+    friendly_message = if e.message.include?("Authentication failed")
+      "SSH 认证失败：用户名或密码/私钥不正确"
+    else
+      "SSH 认证失败：#{e.message}"
+    end
+    handle_error(friendly_message)
+    raise RuntimeError, friendly_message
   rescue Net::SSH::ConnectionTimeout, Errno::ETIMEDOUT => e
-    handle_error("连接超时: #{e.message}")
+    error_message = "连接超时: #{e.message}"
+    handle_error(error_message)
+    raise RuntimeError, error_message
   rescue Errno::ECONNREFUSED => e
-    handle_error("连接被拒绝: #{e.message}")
+    error_message = "连接被拒绝: #{e.message}"
+    handle_error(error_message)
+    raise RuntimeError, error_message
   rescue SocketError => e
-    handle_error("网络错误: #{e.message}")
+    error_message = "网络错误: #{e.message}"
+    handle_error(error_message)
+    raise RuntimeError, error_message
   rescue Net::SSH::Exception => e
-    handle_error("SSH错误: #{e.message}")
+    error_message = "SSH错误: #{e.message}"
+    handle_error(error_message)
+    raise RuntimeError, error_message
   end
 
   def handle_error(message)
