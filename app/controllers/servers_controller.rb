@@ -48,10 +48,10 @@ class ServersController < ApplicationController
     respond_to do |format|
       if @server.update(server_params)
         format.html { redirect_to servers_path, notice: "服务器更新成功" }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@server, :notes), partial: "servers/notes", locals: { server: @server }) }
+        format.turbo_stream { redirect_to servers_path, notice: "服务器更新成功" }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@server, :notes), partial: "servers/notes", locals: { server: @server }), status: :unprocessable_entity }
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
       end
     end
   end

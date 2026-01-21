@@ -1,4 +1,4 @@
-<%= form_with model: server, class: "space-y-6" do |form| %>
+<%= form_with model: server, class: "space-y-6", data: { turbo: false } do |form| %>
   <% if server.errors.any? %>
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
       <ul class="list-disc list-inside">
