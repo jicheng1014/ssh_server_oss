@@ -58,7 +58,16 @@ class SystemSetting < ApplicationRecord
   # 系统级私钥配置（使用加密存储）
   # 注意：这里使用一个特殊的 SystemPrivateKey 模型来处理加密
   def self.system_private_key
-    SystemPrivateKey.first&.private_key
+    record = SystemPrivateKey.first
+    return nil unless record
+
+    begin
+      record.private_key
+    rescue ActiveRecord::Encryption::Errors::Decryption => e
+      # 如果解密失败（可能是加密密钥已更改），返回 nil
+      Rails.logger.warn "无法解密系统私钥: #{e.message}"
+      nil
+    end
   end
 
   def self.system_private_key=(key)
@@ -72,6 +81,8 @@ class SystemSetting < ApplicationRecord
   end
 
   def self.system_private_key_configured?
+    # 尝试读取私钥，如果能成功读取则返回 true
+    # 如果解密失败，返回 false（避免因解密错误导致的问题）
     system_private_key.present?
   end
 end

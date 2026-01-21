@@ -71,6 +71,54 @@
   <% end %>
 </div>
 
+<!-- Authentication Info -->
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+  <h2 class="text-lg font-semibold text-gray-800 mb-4">认证信息</h2>
+  <div class="space-y-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-gray-700">SSH 私钥：</span>
+        <% if @server.private_key.present? %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            已配置特殊私钥
+          </span>
+        <% else %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            使用全局配置
+          </span>
+        <% end %>
+      </div>
+      <% if @server.private_key.present? %>
+        <%= button_to "删除特殊私钥", delete_private_key_server_path(@server), 
+            method: :delete, 
+            data: { confirm: "确定要删除该服务器的特殊私钥吗？删除后将使用全局配置的私钥。" },
+            class: "bg-red-500 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded text-sm" %>
+      <% end %>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-sm font-medium text-gray-700">SSH 密码：</span>
+      <% if @server.password.present? %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          已配置
+        </span>
+      <% else %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          未配置
+        </span>
+      <% end %>
+    </div>
+    <p class="text-xs text-gray-500 mt-2">
+      认证优先级：服务器私钥 > 服务器密码 > 全局私钥配置
+    </p>
+  </div>
+</div>
+
 <!-- System Info -->
 <% if @server.os_name.present? %>
   <div class="bg-white rounded-lg shadow p-6 mb-6">

@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       post :refresh
       get :top
       get :ps
+      delete :delete_private_key
     end
     collection do
       post :refresh_all

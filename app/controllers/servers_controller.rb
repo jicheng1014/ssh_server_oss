@@ -1,5 +1,5 @@
 class ServersController < ApplicationController
-  before_action :set_server, only: %i[show edit update destroy refresh top ps]
+  before_action :set_server, only: %i[show edit update destroy refresh top ps delete_private_key]
 
   def index
     @servers = Server.includes(:server_metrics).ordered
@@ -88,6 +88,16 @@ class ServersController < ApplicationController
     format = params[:format] || "aux"
     result = PsCommandService.new(@server, format: format).call
     render json: result
+  end
+
+  def delete_private_key
+    if @server.private_key.blank?
+      redirect_to @server, alert: "该服务器未配置特殊私钥"
+      return
+    end
+
+    @server.update(private_key: nil)
+    redirect_to @server, notice: "服务器的特殊私钥已删除，将使用全局配置的私钥"
   end
 
   def refresh_all
