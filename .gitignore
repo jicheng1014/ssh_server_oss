@@ -9,6 +9,8 @@
 
 # Ignore all environment files.
 /.env*
+!/.env.example
+PRIVACY_CHECKLIST.md
 
 # Ignore all logfiles and tempfiles.
 /log/*

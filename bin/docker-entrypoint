@@ -1,7 +1,74 @@
 #!/bin/bash -e
 
+# 加载 .env 文件（如果存在）
+if [ -f .env ]; then
+  set -a
+  source .env
+  set +a
+fi
+
+# 初始化 SECRET_KEY_BASE（如果未配置）
+if [ -z "$SECRET_KEY_BASE" ] && [ -z "$RAILS_MASTER_KEY" ]; then
+  # 检查 .env 文件中是否已有 SECRET_KEY_BASE
+  if [ -f .env ] && grep -q "^SECRET_KEY_BASE=" .env; then
+    # 从 .env 文件加载
+    export SECRET_KEY_BASE=$(grep "^SECRET_KEY_BASE=" .env | cut -d '=' -f2- | tr -d '"' | tr -d "'")
+  else
+    # 生成新的 SECRET_KEY_BASE
+    echo "未检测到 SECRET_KEY_BASE，正在自动生成..."
+    SECRET_KEY_BASE=$(openssl rand -hex 64)
+    export SECRET_KEY_BASE
+    # 保存到 .env 文件
+    if [ -w .env ] || [ -w . ]; then
+      echo "" >> .env
+      echo "# SECRET_KEY_BASE (自动生成于 $(date))" >> .env
+      echo "SECRET_KEY_BASE=$SECRET_KEY_BASE" >> .env
+      echo "SECRET_KEY_BASE 已保存到 .env 文件"
+    fi
+  fi
+fi
+
+# 初始化加密密钥（如果未配置）
+# 先检查 .env 文件中是否已有密钥（避免重复生成）
+if [ -z "$ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY" ]; then
+  if [ -f .env ] && grep -q "^ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=" .env; then
+    # 从 .env 文件加载已有的密钥（避免重复生成）
+    export ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=$(grep "^ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=" .env | head -1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" | xargs)
+    export ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=$(grep "^ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=" .env | head -1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" | xargs)
+    export ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=$(grep "^ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=" .env | head -1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" | xargs)
+    if [ -n "$ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY" ]; then
+      echo "已从 .env 文件加载加密密钥（不会重新生成）"
+    else
+      echo "警告: .env 文件中存在密钥配置但无法读取，将生成新密钥"
+      # 继续执行生成逻辑
+    fi
+  fi
+  
+  # 如果仍然没有密钥，生成新密钥
+  if [ -z "$ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY" ]; then
+    echo "未检测到加密密钥，正在自动生成..."
+    # 确保 SECRET_KEY_BASE 已设置（Rails 任务需要）
+    if [ -z "$SECRET_KEY_BASE" ]; then
+      export SECRET_KEY_BASE=$(openssl rand -hex 64)
+    fi
+    # 运行初始化任务（会生成密钥并写入 .env）
+    SECRET_KEY_BASE="$SECRET_KEY_BASE" ./bin/rails db:encryption:init 2>&1 | grep -v "WARNING\|DEPRECATION" || true
+    # 重新加载环境变量（如果写入了 .env）
+    if [ -f .env ]; then
+      set -a
+      source .env
+      set +a
+    fi
+  fi
+fi
+
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
+
+# If running the jobs processor, also prepare database
+if [ "${@: -1:1}" == "jobs" ] || [ "${@: -1:1}" == "./bin/jobs" ]; then
   ./bin/rails db:prepare
 fi
 

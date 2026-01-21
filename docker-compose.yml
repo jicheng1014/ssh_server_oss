@@ -1,0 +1,48 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ssh_server_web
+    ports:
+      - "3000:80"
+    volumes:
+      - ./storage:/rails/storage
+      - ./.env:/rails/.env
+    environment:
+      - RAILS_ENV=production
+      # 加密密钥（如果通过环境变量配置，取消下面的注释）
+      # - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=${ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY}
+      # - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=${ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY}
+      # - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=${ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT}
+      # SSH 私钥（可选，如果通过环境变量配置）
+      # - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
+      # - SSH_KEY_PATH=${SSH_KEY_PATH}
+    restart: unless-stopped
+    depends_on:
+      - jobs
+    command: ["./bin/thrust", "./bin/rails", "server"]
+
+  jobs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ssh_server_jobs
+    volumes:
+      - ./storage:/rails/storage
+      - ./.env:/rails/.env
+    environment:
+      - RAILS_ENV=production
+      # 加密密钥（如果通过环境变量配置，取消下面的注释）
+      # - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY=${ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY}
+      # - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY=${ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY}
+      # - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT=${ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT}
+      # SSH 私钥（可选，如果通过环境变量配置）
+      # - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
+      # - SSH_KEY_PATH=${SSH_KEY_PATH}
+    restart: unless-stopped
+    command: ["./bin/jobs"]
+
+volumes:
+  storage:
+    driver: local

@@ -1,23 +1,11 @@
 <div class="max-w-4xl mx-auto space-y-6">
   <h1 class="text-3xl font-bold mb-6">系统配置</h1>
 
-  <% if flash[:notice] %>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-      <%= flash[:notice] %>
-    </div>
-  <% end %>
-
-  <% if flash[:alert] %>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-      <%= flash[:alert].html_safe %>
-    </div>
-  <% end %>
-
   <!-- 服务器配置导入导出 -->
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">服务器配置管理</h2>
     <p class="text-gray-600 mb-4">导出或导入服务器配置（仅包含用户录入的字段）</p>
-    
+
     <div class="flex gap-4">
       <%= link_to export_servers_settings_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center" do %>
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +26,7 @@
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">监控任务频率</h2>
     <p class="text-gray-600 mb-4">设置服务器监控任务的运行频率（单位：分钟）</p>
-    
+
     <%= form_with url: update_monitor_interval_settings_path, method: :patch, class: "space-y-4" do |form| %>
       <div class="flex items-center gap-4">
         <div class="flex-1">
@@ -57,7 +45,7 @@
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">检测日志保留</h2>
     <p class="text-gray-600 mb-4">设置检测日志的保留天数，超过保留天数的日志将在每天凌晨 3 点自动清理</p>
-    
+
     <%= form_with url: update_metrics_retention_days_settings_path, method: :patch, class: "space-y-4" do |form| %>
       <div class="flex items-center gap-4">
         <div class="flex-1">
@@ -76,7 +64,7 @@
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">系统级 SSH 私钥配置</h2>
     <p class="text-gray-600 mb-4">系统级私钥优先级高于 Rails credentials，但低于环境变量配置。私钥使用 Active Record Encryption 加密存储。</p>
-    
+
     <div class="mb-4">
       <div class="flex items-center gap-2 mb-2">
         <span class="text-sm font-medium text-gray-700">当前状态：</span>
@@ -109,7 +97,7 @@
             <button type="button" onclick="showSystemPrivateKeyForm()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               修改
             </button>
-            <%= button_to delete_system_private_key_settings_path, method: :delete, 
+            <%= button_to delete_system_private_key_settings_path, method: :delete,
                 class: "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded",
                 data: { confirm: "确定要删除系统私钥吗？" } do %>
               删除
@@ -121,7 +109,7 @@
         <div id="system-private-key-edit" class="space-y-4" style="display: none;">
           <%= form_with url: update_system_private_key_settings_path, method: :patch, class: "space-y-4", data: { turbo: false } do |form| %>
             <div>
-              <%= form.text_area :system_private_key, 
+              <%= form.text_area :system_private_key,
                   rows: 15,
                   class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border font-mono text-xs",
                   placeholder: "请输入 SSH 私钥内容..." %>
@@ -139,7 +127,7 @@
         <!-- 未配置时显示表单 -->
         <%= form_with url: update_system_private_key_settings_path, method: :patch, class: "space-y-4" do |form| %>
           <div>
-            <%= form.text_area :system_private_key, 
+            <%= form.text_area :system_private_key,
                 rows: 15,
                 class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border font-mono text-xs",
                 placeholder: "请输入 SSH 私钥内容..." %>
@@ -156,7 +144,17 @@
   <!-- SSH 私钥配置说明 -->
   <div class="bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-semibold mb-4">SSH 私钥配置说明</h2>
-    
+
+    <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+      <p class="text-sm text-yellow-800 mb-2">
+        <strong>部署方式说明：</strong>
+      </p>
+      <ul class="text-sm text-yellow-800 list-disc list-inside space-y-1">
+        <li><strong>如果是 Docker 部署</strong>，推荐使用上方的<strong>系统级 SSH 私钥配置</strong>（已加密存储，安全便捷）</li>
+        <li><strong>如果是手动运行</strong>，请参考下列私钥配置方式</li>
+      </ul>
+    </div>
+
     <div class="mb-4">
       <div class="flex items-center gap-2 mb-2">
         <span class="text-sm font-medium text-gray-700">当前状态：</span>

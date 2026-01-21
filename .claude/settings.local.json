@@ -15,7 +15,16 @@
       "Bash(bundle exec rails:*)",
       "Bash(bin/rails:*)",
       "Bash(sqlite3:*)",
-      "Bash(bin/importmap pin:*)"
+      "Bash(bin/importmap pin:*)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server ls-files:*)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server log --oneline --all -- config/deploy.yml .kamal/secrets)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server show b857e0f:config/deploy.yml)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server show b857e0f:.kamal/secrets)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server log --oneline --all)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server show 28ab688:PRIVACY_CHECKLIST.md)",
+      "Bash(git grep:*)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server status --short)",
+      "Bash(git -C /Users/jicheng/Code/Ruby/ssh_server diff PRIVACY_CHECKLIST.md)"
     ]
   }
 }

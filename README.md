@@ -36,13 +36,64 @@
 
 ## 🚀 快速开始
 
-### 系统要求
+### 方式一：Docker 一键启动（推荐，最简单）
+
+**系统要求：**
+- Docker 和 Docker Compose
+
+**启动步骤：**
+
+1. **克隆项目**
+```bash
+git clone <repository-url>
+cd ssh_server
+```
+
+2. **一键启动**
+```bash
+./start.sh
+```
+
+就这么简单！脚本会自动完成：
+- ✅ 检查 Docker 环境
+- ✅ 构建 Docker 镜像
+- ✅ 初始化数据库
+- ✅ 自动生成加密密钥
+- ✅ 启动 Web 服务和后台任务处理器
+
+3. **访问应用**
+打开浏览器访问 `http://localhost:3000`
+
+**常用命令：**
+```bash
+# 查看日志
+docker compose logs -f
+
+# 停止服务
+docker compose down
+
+# 重启服务
+docker compose restart
+
+# 查看服务状态
+docker compose ps
+```
+
+**数据持久化：**
+- 数据库文件存储在 `./storage` 目录
+- 加密密钥自动保存在 `.env` 文件中（首次启动后生成）
+
+---
+
+### 方式二：本地开发环境
+
+**系统要求：**
 
 - Ruby 3.4+
 - Node.js 18+（用于 TailwindCSS）
 - SQLite 3.8+
 
-### 安装步骤
+**安装步骤：**
 
 1. **克隆项目**
 ```bash
