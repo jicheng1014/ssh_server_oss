@@ -51,12 +51,12 @@ cd ssh_server
 
 2. **一键启动**
 ```bash
-./start.sh
+./start-prod.sh
 ```
 
 就这么简单！脚本会自动完成：
 - ✅ 检查 Docker 环境
-- ✅ 构建 Docker 镜像
+- ✅ 从 Docker Hub 拉取最新镜像 `atpking/ssh_server_monitor:latest`
 - ✅ 初始化数据库
 - ✅ 自动生成加密密钥
 - ✅ 启动 Web 服务和后台任务处理器
@@ -67,21 +67,27 @@ cd ssh_server
 **常用命令：**
 ```bash
 # 查看日志
-docker compose logs -f
+docker compose -f docker-compose.prod.yml logs -f
 
 # 停止服务
-docker compose down
+docker compose -f docker-compose.prod.yml down
 
 # 重启服务
-docker compose restart
+docker compose -f docker-compose.prod.yml restart
 
 # 查看服务状态
-docker compose ps
+docker compose -f docker-compose.prod.yml ps
+
+# 更新到最新镜像
+docker pull atpking/ssh_server_monitor:latest
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 **数据持久化：**
 - 数据库文件存储在 `./storage` 目录
 - 加密密钥自动保存在 `.env` 文件中（首次启动后生成）
+
+**提示：** 如果需要本地构建镜像（修改代码后），可以使用 `./start.sh` 脚本。
 
 ---
 
